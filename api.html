@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>document</title>
+</head>
+
+<body>
+    <div class="container">
+        <h1>COVID-19 Data</h1>
+        <input type="text" id="country_name" placeholder="Enter a country name...">
+        <button>Get Data</button>
+        
+        <div id="coviddata" class="data-display"></div>
+        <p id="error-message" class="error-message"></p>
+    </div>
+
+    <script>
+        document.querySelector("button").addEventListener("click", function () {
+            const country = document.getElementById("country_name").value.trim().toLowerCase();
+
+            if (!country) {
+                document.getElementById('error-message').textContent = 'Please enter a valid country name.';
+                document.getElementById('coviddata').innerHTML = '';
+                return;
+            }
+
+            const apiUrl = `https://disease.sh/v3/covid-19/countries/${country}`;
+
+            fetch(apiUrl)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Country not found!');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    const result = document.getElementById('coviddata');
+                    const errorMessage = document.getElementById('error-message');
+                    errorMessage.textContent = '';
+
+                    result.innerHTML = `
+                        <h3>COVID-19 in ${data.country}</h3>
+                        <p><b>Total Cases: </b>${data.cases}</p>
+                        <p><b>Total Deaths: </b>${data.deaths}</p>
+                        <p><b>Total Recovered: </b>${data.recovered}</p>
+                        <p><b>Active Cases: </b>${data.active}</p>
+                        <p><b>Critical Cases: </b>${data.critical}</p>
+                        <p><b>Tests Conducted: </b>${data.tests}</p>
+                    `;
+                    console.log(data);
+                })
+                .catch(error => {
+                    const errorMessage = document.getElementById('error-message');
+                    errorMessage.textContent = error.message;
+                    document.getElementById('coviddata').innerHTML = '';
+                });
+        });
+    </script>
+</body>
+
+</html>
